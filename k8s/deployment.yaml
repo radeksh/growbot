@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: growbot-sensor-exporter
+  namespace: monitoring
+  labels:
+    app: growbot-sensor-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: growbot-sensor-exporter
+  template:
+    metadata:
+      labels:
+        app: growbot-sensor-exporter
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: chan01
+      containers:
+        - name: exporter
+          image: ghcr.io/OWNER/growbot/sensor-exporter:latest  # update OWNER to your GitHub username/org
+          ports:
+            - name: metrics
+              containerPort: 9101
+              protocol: TCP
+          env:
+            - name: SENSOR_NODE
+              value: "chan01"
+            - name: POLL_INTERVAL
+              value: "30"
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: dev-serial0
+              mountPath: /dev/serial0
+            - name: dev-i2c-1
+              mountPath: /dev/i2c-1
+      volumes:
+        - name: dev-serial0
+          hostPath:
+            path: /dev/serial0
+            type: CharDevice
+        - name: dev-i2c-1
+          hostPath:
+            path: /dev/i2c-1
+            type: CharDevice

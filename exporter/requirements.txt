@@ -1,0 +1,4 @@
+prometheus_client
+smbus2
+RPi.bme280
+pms7003

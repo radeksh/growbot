@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: growbot-sensor-exporter
+  namespace: monitoring
+  labels:
+    app: growbot-sensor-exporter
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: growbot-sensor-exporter
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s

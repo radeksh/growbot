@@ -2,7 +2,7 @@ name: Build sensor exporter image
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - "exporter/**"
       - ".github/workflows/build.yaml"
@@ -42,7 +42,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
 
       - uses: docker/build-push-action@v6
         with:
